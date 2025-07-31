@@ -13,7 +13,7 @@ const Register = () => {
     setMsg("");
     try {
       await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}api/auth/register`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/auth/register`,
         { email, password }
       );
       setMsg("✅ Registration successful! Redirecting to login...");
