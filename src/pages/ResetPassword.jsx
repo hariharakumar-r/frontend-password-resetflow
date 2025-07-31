@@ -13,7 +13,7 @@ const ResetPassword = () => {
     setMsg("");
     try {
       await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/auth/reset-password`,
+        `${import.meta.env.VITE_BACKEND_URL}api/auth/reset-password`,
         { token, password }
       );
       setMsg("✅ Password reset successfully! Redirecting to login...");

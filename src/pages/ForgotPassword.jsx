@@ -14,7 +14,7 @@ const ForgotPassword = () => {
     setMsg("");
     try {
       await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/auth/forgot-password`,
+        `${import.meta.env.VITE_BACKEND_URL}api/auth/forgot-password`,
         { email }
       );
       setMsg("✅ Check your email for a reset link.");
