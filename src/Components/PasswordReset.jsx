@@ -18,7 +18,7 @@ const PasswordReset = () => {
     try {
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/resetPassword`,
-        { email }
+        { email },{ withCredentials: true }
       );
       alert(response.data.message);
     } catch (error) {
