@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
+import Cookies from "js-cookie"; // <-- Add this import
 
 const SignIn = () => {
   const navigate = useNavigate();
@@ -11,6 +11,12 @@ const SignIn = () => {
 
   // Check for token on component load
   useEffect(() => {
+    // Example: Read the token cookie (if not HttpOnly)
+    const token = Cookies.get("token");
+    if (token) {
+      console.log("Token from cookie:", token);
+    }
+
     axios
       .get(`${import.meta.env.VITE_API_URL}/userInfo`, {
         withCredentials: true,
@@ -41,7 +47,8 @@ const SignIn = () => {
         { withCredentials: true } // Include cookies in the request
       )
       .then((response) => {
-        console.log("Login successful:", response.data.message);
+        // If backend sets a non-HttpOnly cookie, you can set it here as well:
+        // Cookies.set("token", response.data.token);
         alert("Login Successful");
         navigate("/userInfo"); // Redirect to UserInfo page
       })

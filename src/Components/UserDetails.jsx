@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Cookies from "js-cookie"; // <-- Add this import
 
 const UserDetails = () => {
   const [name, setName] = useState("");
@@ -8,6 +9,14 @@ const UserDetails = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Example: Read the token cookie (if not HttpOnly)
+    const token = Cookies.get("token");
+    if (token) {
+      console.log("Token from cookie:", token);
+    } else {
+      console.log("No token cookie found (may be HttpOnly)");
+    }
+
     axios
       .get(`${import.meta.env.VITE_API_URL}/userInfo`, {
         withCredentials: true,
@@ -38,6 +47,8 @@ const UserDetails = () => {
         withCredentials: true,
       })
       .then((response) => {
+        // Remove token cookie if present (not HttpOnly)
+        Cookies.remove("token");
         alert(response.data.message); // Logout Successful message
         navigate("/signin"); // Redirect to SignIn
       })
