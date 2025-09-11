@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Validator from "validator";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const RegistrationForm = () => {
@@ -9,38 +9,38 @@ const RegistrationForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [reEnteredpassword, setReenterPassword] = useState("");
-  const [terms, setTerms] = useState("close");
-  const [validateEmail, setValidateEmail] = useState("false");
+  const [isTermsOpen, setIsTermsOpen] = useState(false);
+  const [isEmailValid, setIsEmailValid] = useState(true);
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isRePasswordVisible, setIsRePasswordVisible] = useState(false);
 
   const handleRegistration = (e) => {
     e.preventDefault();
-    if (name == "") return alert("The Name is required");
-    if (email == "" || validateEmail == false)
-      return alert("Please Enter Valid Email ID");
-    if (password == "" || password != reEnteredpassword)
-      return alert("Pleasse Enter same password in both fields");
+    if (name === "") return alert("The Name is required");
+    if (email === "" || !isEmailValid)
+      return alert("Please enter a valid email ID");
+    if (password === "" || password !== reEnteredpassword)
+      return alert("Passwords do not match. Please re-enter.");
 
     axios
-      .post(`${import.meta.env.VITE_API_URL}/register`, {
-        name: name,
-        email: email,
-        password: password,
-      })
+      .post(
+        `${import.meta.env.VITE_API_URL}/register`,
+        { name, email, password },
+        { withCredentials: true } // This is important for sending and receiving cookies!
+      )
       .then((response) => {
         console.log("Registration successful:", response.data.message);
         alert(
-          "User Created Successfully. Now You can login with those credintials"
+          "Welcome! Your account has been created, and you are now logged in."
         );
+        navigate("/userInfo"); // Go directly to the user info page!
       })
-      .then(() => navigate("/signin"))
       .catch((error) => {
         if (error.response && error.response.status === 400) {
-          alert(error.response.data.error); // Backend sends 'User already exists'
+          alert(error.response.data.error);
         } else {
           console.error("Registration failed:", error);
-          alert("An error occurred during registration. Please try again.");
+          alert("Something went wrong. Please try registering again.");
         }
       });
   };
@@ -49,11 +49,10 @@ const RegistrationForm = () => {
     setName(e.target.value);
   };
   const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-    if (Validator.isEmail(e.target.value)) {
-      return setValidateEmail("true");
-    }
-    setValidateEmail("false");
+    const value = e.target.value;
+    setEmail(value);
+    // Show error only if the field is not empty and invalid
+    setIsEmailValid(value === "" || Validator.isEmail(value));
   };
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
@@ -64,7 +63,7 @@ const RegistrationForm = () => {
 
   return (
     <div className="font-[sans-serif] bg-white relative left-[25%]  mx-auto md:h-screen p-4 gap-8">
-      {terms == "open" ? (
+      {isTermsOpen ? (
         <>
           <div className="max-h-full   flex-col fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
             <div className="bg-white p-6 rounded-lg w-full max-w-md flex flex-col justify-between">
@@ -74,7 +73,7 @@ const RegistrationForm = () => {
                   Terms & Conditions{" "}
                 </p>
                 <ul className="list-decimal space-y-2">
-                  <li>This is an examplae app for Password Reset Flow</li>
+                  <li>This is an example app for Password Reset Flow</li>
                   <li>Here Don't share your important things</li>
                   <li>
                     Don't use your app passwords. Instead store some unique
@@ -84,7 +83,7 @@ const RegistrationForm = () => {
               </div>
               <button
                 className="mt-4 bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700"
-                onClick={() => setTerms("close")}
+                onClick={() => setIsTermsOpen(false)}
               >
                 Close
               </button>
@@ -200,13 +199,7 @@ const RegistrationForm = () => {
                   </g>
                 </svg>
               </div>
-              {validateEmail == "false" && email != "" ? (
-                <>
-                  <p className="text-red-500">*Enter Valid Email</p>
-                </>
-              ) : (
-                <></>
-              )}
+              {!isEmailValid && <p className="text-red-500">*Enter Valid Email</p>}
             </div>
 
             <div>
@@ -267,13 +260,9 @@ const RegistrationForm = () => {
                 </svg>
               </div>
             </div>
-            {reEnteredpassword == "" || reEnteredpassword == password ? (
-              <></>
-            ) : (
-              <div className="text-red-500">
-                *Please Enter the same values in both the fields
-              </div>
-            )}
+            {reEnteredpassword && password !== reEnteredpassword ? (
+              <div className="text-red-500">*Passwords do not match</div>
+            ) : null}
 
             <div className="flex items-center">
               <input
@@ -288,7 +277,7 @@ const RegistrationForm = () => {
               >
                 I accept the{" "}
                 <span
-                  onClick={() => setTerms("open")}
+                  onClick={() => setIsTermsOpen(true)}
                   className="text-blue-600 font-semibold hover:underline ml-1"
                 >
                   Terms and Conditions
