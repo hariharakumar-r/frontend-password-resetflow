@@ -15,24 +15,25 @@ const SignIn = () => {
     const token = Cookies.get("token");
     if (token) {
       console.log("Token from cookie:", token);
+       axios
+         .get(`${import.meta.env.VITE_API_URL}/userInfo`, {
+           withCredentials: true,
+         })
+         .then(() => {
+           // If token is valid, redirect to userInfo
+           navigate("/userInfo");
+         })
+         .catch((error) => {
+           // If no token or token is invalid, do nothing
+           if (error.response && error.response.status === 401) {
+             console.log("No valid token found. Stay on SignIn.");
+           } else {
+             console.error("Error checking token:", error);
+           }
+         });
     }
 
-    axios
-      .get(`${import.meta.env.VITE_API_URL}/userInfo`, {
-        withCredentials: true,
-      })
-      .then(() => {
-        // If token is valid, redirect to userInfo
-        navigate("/userInfo");
-      })
-      .catch((error) => {
-        // If no token or token is invalid, do nothing
-        if (error.response && error.response.status === 401) {
-          console.log("No valid token found. Stay on SignIn.");
-        } else {
-          console.error("Error checking token:", error);
-        }
-      });
+   
   }, [navigate]);
 
   const handleLogin = (e) => {
